@@ -1,0 +1,18 @@
+[33mec37ce5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: commit: some change and modify
+[33m2d7e6c9[m HEAD@{1}: rebase (finish): returning to refs/heads/main
+[33m2d7e6c9[m HEAD@{2}: rebase (continue): banner image added from backend api
+[33m25fb1c8[m HEAD@{3}: pull origin main --rebase (start): checkout 25fb1c8fed20d57d6e704ebbd6cb722bcae13443
+[33ma977373[m HEAD@{4}: commit: banner image added from backend api
+[33m8b93bed[m HEAD@{5}: commit: change folder name
+[33mcee5aa1[m HEAD@{6}: commit: add customer reviews
+[33mec69a64[m HEAD@{7}: commit: limited addition carousel added in hompage
+[33mba428e4[m HEAD@{8}: commit: add Not Found
+[33m0212dd7[m HEAD@{9}: commit: product details added
+[33mfb2e1b0[m HEAD@{10}: commit: footer updated
+[33m1145a09[m HEAD@{11}: commit: login field added
+[33m3cad2fb[m HEAD@{12}: commit: shop page update
+[33m7a0c447[m HEAD@{13}: commit: product details added
+[33m92077bb[m HEAD@{14}: commit: shop page done
+[33m3fbeeeb[m HEAD@{15}: commit: project setup and created header section
+[33m9948920[m HEAD@{16}: Branch: renamed refs/heads/master to refs/heads/main
+[33m9948920[m HEAD@{18}: commit (initial): first commit
