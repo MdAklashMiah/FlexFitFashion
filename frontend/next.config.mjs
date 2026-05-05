@@ -4,7 +4,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "fullstack-backend-4dz8.onrender.com",
+        hostname: "flexfitfashion.onrender.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.vercel.app",
       },
       {
         protocol: "https",

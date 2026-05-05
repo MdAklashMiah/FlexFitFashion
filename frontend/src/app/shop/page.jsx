@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import Container from "@/components/common/Container";
 import Product from "@/components/common/Product";
 import ProductSkeleton from "@/components/common/ProductSkeleton";
@@ -10,7 +10,7 @@ import { useGetCategoriesQuery } from "@/slices/categoryApiSlice";
 import { useSearchParams } from "next/navigation";
 import { Filter, ChevronDown, LayoutGrid, List, Search, SlidersHorizontal, X } from "lucide-react";
 
-const ShopPage = () => {
+const ShopContent = () => {
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("category");
 
@@ -286,6 +286,22 @@ const ShopPage = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const ShopPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="bg-white min-h-screen py-24">
+        <Container>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <ProductSkeleton key={i} />)}
+          </div>
+        </Container>
+      </div>
+    }>
+      <ShopContent />
+    </Suspense>
   );
 };
 
