@@ -7,13 +7,13 @@ const { authCheckMiddleware, adminCheckMiddleware } = require("../../../utils/au
 const router = express.Router();
 
 
-router.post("/createproduct", authCheckMiddleware, adminCheckMiddleware, upload.array("product"), createProductController)
+router.post("/createproduct", authCheckMiddleware, adminCheckMiddleware, upload.array("images"), createProductController)
 
 router.get("/allproducts", allProductController)
 
 router.get("/latestproduct" , latestProductController)
 
-router.patch("/updateproduct/:id", authCheckMiddleware, adminCheckMiddleware, upload.array("product"), updateProductController)
+router.patch("/updateproduct/:id", authCheckMiddleware, adminCheckMiddleware, upload.array("images"), updateProductController)
 
 router.delete("/deleteproduct/:id", authCheckMiddleware, adminCheckMiddleware, deleteProductController)
 
