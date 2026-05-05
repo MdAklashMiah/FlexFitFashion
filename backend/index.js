@@ -8,6 +8,11 @@ const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 4000
 
+// Start listening immediately to satisfy Render's port scan
+app.listen(port, "0.0.0.0", () => {
+    console.log(`🚀 Server is listening on port: ${port}`);
+});
+
 // Middlewares
 app.use(cors({
     origin: [process.env.CLIENT_URL, "http://localhost:3000"],
@@ -39,11 +44,6 @@ app.use(pathNotFound)
 // Error handling middleware
 app.use(errorHandlingMiddleware)
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(port, () => {
-        console.log(`Server is Running Port: ${port}`)
-    })
-}
+console.log("✅ Server initialization complete");
 
 module.exports = app;
