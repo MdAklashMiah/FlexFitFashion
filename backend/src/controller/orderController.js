@@ -4,7 +4,7 @@ const orderModel = require("../model/order.model");
 const SSLCommerzPayment = require("sslcommerz-lts");
 const store_id = process.env.SSL_STORE_ID;
 const store_passwd = process.env.SSL_STORE_PASSWORD;
-const is_live = false; //true for live, false for sandbox
+const is_live = process.env.PAYMENT_LIVE_MODE === "true"; // true for live, false for sandbox
 
 let createOrderController = async (req, res) => {
   try {
