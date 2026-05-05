@@ -30,17 +30,35 @@ const AddProduct = () => {
     discountprice: "",
     stock: "",
     category: "",
+    subcategory: "",
     variantType: "singleVariant",
   });
 
   const [images, setImages] = useState([]);
-  const [variants, setVariants] = useState([]); // [{size, color}]
+  const [variants, setVariants] = useState([]);
+  const [allSubcategories, setAllSubcategories] = useState([]);
+  const [filteredSubcategories, setFilteredSubcategories] = useState([]);
   
   useEffect(() => {
+    // Fetch Categories
     axios.get(`${process.env.NEXT_PUBLIC_API}/category/allcategory`)
       .then(res => setCategories(res.data.data))
       .catch(err => console.error(err));
+
+    // Fetch Subcategories
+    axios.get(`${process.env.NEXT_PUBLIC_API}/subcategory/allsubcategory`)
+      .then(res => setAllSubcategories(res.data.data))
+      .catch(err => console.error(err));
   }, []);
+
+  useEffect(() => {
+    if (formData.category) {
+      const filtered = allSubcategories.filter(sub => sub.category === formData.category);
+      setFilteredSubcategories(filtered);
+    } else {
+      setFilteredSubcategories([]);
+    }
+  }, [formData.category, allSubcategories]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,7 +95,6 @@ const AddProduct = () => {
     try {
       const token = localStorage.getItem("token");
       
-      // 1. Create Product with images in one multipart request
       const mainFormData = new FormData();
       mainFormData.append("title", formData.title);
       mainFormData.append("description", formData.description);
@@ -85,30 +102,24 @@ const AddProduct = () => {
       mainFormData.append("discountprice", formData.discountprice);
       mainFormData.append("stock", formData.stock);
       mainFormData.append("category", formData.category);
+      mainFormData.append("subcategory", formData.subcategory);
       mainFormData.append("variantType", formData.variantType);
       
+      // Send variants as JSON string (Backend now handles this in one request)
+      if (formData.variantType === "multiVariant" && variants.length > 0) {
+        mainFormData.append("variants", JSON.stringify(variants));
+      }
+      
       images.forEach(img => {
-        mainFormData.append("product", img); // Backend expects "product" field
+        mainFormData.append("images", img); // Backend expects "images" field
       });
       
-      const productRes = await axios.post(`${process.env.NEXT_PUBLIC_API}/product/createproduct`, mainFormData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API}/product/createproduct`, mainFormData, {
         headers: { 
           token, 
           "Content-Type": "multipart/form-data" 
         }
       });
-
-      const productId = productRes.data.data._id;
-
-      // 2. Add Variants if multi-variant
-      if (formData.variantType === "multiVariant" && variants.length > 0) {
-        await Promise.all(variants.map(v => 
-          axios.post(`${process.env.NEXT_PUBLIC_API}/variant/addvariant`, {
-            ...v,
-            product: productId
-          }, { headers: { token } })
-        ));
-      }
 
       alert("Product and variants created successfully!");
       router.push("/admin/products");
@@ -322,31 +333,48 @@ const AddProduct = () => {
                   onChange={handleInputChange}
                 />
               </div>
-           </div>
+            </div>
 
-           {/* Organization */}
-           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                 <Layers className="w-4 h-4 text-gray-400" />
-                 <h3 className="text-sm font-black uppercase tracking-widest text-gray-900">Organization</h3>
-              </div>
+          {/* Organization */}
+          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm space-y-6">
+             <div className="flex items-center gap-3 mb-2">
+                <Layers className="w-4 h-4 text-gray-400" />
+                <h3 className="text-sm font-black uppercase tracking-widest text-gray-900">Organization</h3>
+             </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Category</label>
-                <select 
-                  required 
-                  name="category" 
-                  className="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-2xl text-sm focus:bg-white focus:border-black outline-none transition-all font-bold appearance-none cursor-pointer"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Select Category</option>
-                  {categories.map(cat => (
-                    <option key={cat._id} value={cat._id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-           </div>
+             <div className="space-y-2">
+               <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Category</label>
+               <select 
+                 required 
+                 name="category" 
+                 className="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-2xl text-sm focus:bg-white focus:border-black outline-none transition-all font-bold appearance-none cursor-pointer"
+                 value={formData.category}
+                 onChange={handleInputChange}
+               >
+                 <option value="">Select Category</option>
+                 {categories.map(cat => (
+                   <option key={cat._id} value={cat._id}>{cat.name}</option>
+                 ))}
+               </select>
+             </div>
+
+             <div className="space-y-2">
+               <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Sub Category</label>
+               <select 
+                 required 
+                 name="subcategory" 
+                 disabled={!formData.category}
+                 className="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-2xl text-sm focus:bg-white focus:border-black outline-none transition-all font-bold appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                 value={formData.subcategory}
+                 onChange={handleInputChange}
+               >
+                 <option value="">Select Sub Category</option>
+                 {filteredSubcategories.map(sub => (
+                   <option key={sub._id} value={sub._id}>{sub.name}</option>
+                 ))}
+               </select>
+             </div>
+          </div>
 
            {/* Action Buttons */}
            <div className="flex flex-col gap-4 pt-4">

@@ -40,7 +40,7 @@ const AdminProducts = () => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${process.env.NEXT_PUBLIC_API}/product/delete/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API}/product/deleteproduct/${id}`, {
         headers: { token }
       });
       setProducts(products.filter(p => p._id !== id));
