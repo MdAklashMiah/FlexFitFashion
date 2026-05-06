@@ -5,6 +5,9 @@ const router = require("./src/route")
 const errorHandlingMiddleware = require("./src/utils/errorhandling")
 const pathNotFound = require("./src/utils/pathnotfound")
 const cors = require("cors");
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 const app = express()
 const port = process.env.PORT || 4000
 
@@ -14,6 +17,9 @@ app.listen(port, "0.0.0.0", () => {
 });
 
 // Middlewares
+app.use(helmet());
+app.use(compression());
+app.use(morgan("dev"));
 app.use(cors({
     origin: [process.env.CLIENT_URL, "http://localhost:3000"],
     credentials: true
