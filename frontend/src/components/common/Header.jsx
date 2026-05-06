@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, User, Heart, ShoppingCart, X, Shield } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, User, Heart, ShoppingCart, X, Shield, Search } from "lucide-react";
 import SearchBar from "./SearchBar";
 import Container from "./Container";
 import LoginModal from "./auth/LoginModal";
@@ -10,10 +11,9 @@ import SignupModal from "./auth/SignupModal";
 import { useSelector } from "react-redux";
 
 const Header = () => {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [active, setActive] = useState("HOME");
   const [scrolled, setScrolled] = useState(false);
-
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
@@ -22,7 +22,7 @@ const Header = () => {
   // Handle Scroll
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -41,185 +41,180 @@ const Header = () => {
     return () => document.removeEventListener("keydown", handleEsc);
   }, []);
 
-  const navLinks = ["HOME", "SHOP", "COLLECTION", "CONTACT", "ABOUT US"];
-  const getPath = (link) => (link === "HOME" ? "/" : `/${link.toLowerCase().replace(" ", "-")}`);
+  const navLinks = [
+    { name: "HOME", path: "/" },
+    { name: "SHOP", path: "/shop" },
+    { name: "COLLECTION", path: "/collection" },
+    { name: "CONTACT", path: "/contact" },
+    { name: "ABOUT US", path: "/about-us" }
+  ];
+
+  const isActive = (path) => {
+    if (path === "/" && pathname === "/") return true;
+    if (path !== "/" && pathname.startsWith(path)) return true;
+    return false;
+  };
 
   return (
     <>
       <header
-        className={`w-full fixed top-0 left-0 z-[999] transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 py-1" : "bg-white py-3 border-b border-gray-100"
-          }`}
+        className={`w-full fixed top-0 left-0 z-[999] transition-all duration-700 ${
+          scrolled 
+            ? "bg-white/80 backdrop-blur-xl py-2 shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-gray-100/50" 
+            : "bg-white py-5 border-b border-gray-50"
+        }`}
       >
         <Container>
-          <div className="w-full px-4 sm:px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center justify-between px-4 sm:px-6">
             {/* Mobile Menu Button */}
-            <div className="flex items-center gap-4 md:hidden">
+            <div className="flex md:hidden items-center">
               <button
                 aria-label="Open menu"
                 onClick={() => setMobileOpen(true)}
-                className="text-gray-800 hover:text-black transition"
+                className="p-2 -ml-2 text-gray-900"
               >
                 <Menu className="w-6 h-6" />
               </button>
             </div>
 
             {/* Logo */}
-            <Link href="/" className="shrink-0 flex items-center group">
+            <Link href="/" className="relative z-10 shrink-0 group">
               <img
                 src="/images/logo.png"
-                alt="FlexFitFashion Logo"
-                className="h-20 sm:h-16 md:h-20 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                alt="FlexFitFashion"
+                className={`transition-all duration-700 object-contain ${
+                  scrolled ? "h-14" : "h-16 md:h-20"
+                } w-auto group-hover:scale-105`}
               />
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-10 text-[13px] font-semibold tracking-wide uppercase">
+            <nav className="hidden md:flex items-center space-x-12">
               {navLinks.map((link) => (
                 <Link
-                  key={link}
-                  href={getPath(link)}
-                  onClick={() => setActive(link)}
-                  className={`relative transition overflow-hidden group ${active === link ? "text-black" : "text-gray-500 hover:text-black"
-                    }`}
+                  key={link.name}
+                  href={link.path}
+                  className={`relative text-[10px] font-black tracking-[0.3em] uppercase transition-all duration-500 group py-2 ${
+                    isActive(link.path) ? "text-black" : "text-gray-400 hover:text-black"
+                  }`}
                 >
-                  {link}
-                  <span className={`absolute left-0 bottom-0 w-full h-[2px] bg-black transform transition-transform duration-300 ${active === link ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
+                  {link.name}
+                  {/* Elegant Active Indicator */}
+                  <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-black transition-all duration-500 ${
+                    isActive(link.path) ? "opacity-100 scale-100" : "opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100"
+                  }`} />
                 </Link>
               ))}
             </nav>
 
             {/* Right Icons */}
-            <div className="hidden md:flex items-center space-x-6 text-gray-700">
-              {/* User */}
+            <div className="flex items-center space-x-4 md:space-x-8 text-gray-900">
+              {/* User/Account */}
               {user ? (
-                <div className="flex items-center gap-2">
-                  <Link href="/dashboard" className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition cursor-pointer">
+                <Link href="/dashboard" className="hidden md:flex items-center gap-3 group">
+                  <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-500 overflow-hidden">
                     <User className="w-4 h-4" />
-                    <span className="text-sm font-medium truncate max-w-[100px]">
-                      {user.name}
-                    </span>
-                  </Link>
-                  {user.role === "admin" && (
-                    <Link href="/admin" className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded-full tracking-widest hover:bg-gray-800 transition">
-                      ADMIN
-                    </Link>
-                  )}
-                </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account</span>
+                    <span className="text-[10px] font-bold truncate max-w-[80px]">{user.name}</span>
+                  </div>
+                </Link>
               ) : (
                 <button
-                  aria-label="Login"
                   onClick={() => setIsLoginOpen(true)}
-                  className="hover:text-black transition"
+                  className="p-2 hover:bg-gray-50 rounded-full transition-colors group"
                 >
-                  <User className="w-5 h-5" />
+                  <User className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 </button>
               )}
 
               {/* Wishlist */}
-              <button className="hover:text-black transition">
-                <Heart className="w-5 h-5" />
+              <button className="hidden sm:block p-2 hover:bg-gray-50 rounded-full transition-colors group">
+                <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
 
               {/* Cart */}
-              <div className="relative cursor-pointer hover:text-black transition">
-                <Link href={"/cart"}>
-                  <ShoppingCart className="w-5 h-5" />
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                    0
-                  </span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Mobile Cart/User Icons */}
-            <div className="flex items-center space-x-4 md:hidden text-gray-800">
-              {!user && (
-                <button onClick={() => setIsLoginOpen(true)}>
-                  <User className="w-5 h-5" />
-                </button>
-              )}
-              <Link href={"/cart"} className="relative">
-                <ShoppingCart className="w-5 h-5" />
+              <Link href="/cart" className="relative p-2 hover:bg-gray-50 rounded-full transition-colors group">
+                <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="absolute top-1.5 right-1.5 bg-black text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-lg">
+                  0
+                </span>
               </Link>
+
+              {user?.role === "admin" && (
+                <Link href="/admin" className="hidden lg:flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition shadow-xl shadow-black/10">
+                  <Shield className="w-3.5 h-3.5" />
+                  <span className="text-[9px] font-black tracking-widest uppercase">Console</span>
+                </Link>
+              )}
             </div>
           </div>
-        </Container>
 
-        {/* Search Bar - Included conditionally or styled differently */}
-        <Container>
-          <div className="px-4 sm:px-6 pb-2">
-            <SearchBar />
+          {/* Search Bar Integration */}
+          <div className={`transition-all duration-700 overflow-hidden ${scrolled ? "max-h-0 opacity-0" : "max-h-24 opacity-100"}`}>
+            <div className="px-4 sm:px-6 py-4">
+              <SearchBar />
+            </div>
           </div>
         </Container>
       </header>
 
       {/* Mobile Navigation Drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm md:hidden animate-fade-in">
-          <div className="absolute top-0 left-0 w-80 h-full bg-white shadow-2xl p-6 flex flex-col transform transition-transform duration-300">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b">
-              <img src="/images/logo.png" alt="logo" className="h-8 w-auto object-contain" />
-              <button onClick={() => setMobileOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
-                <X className="w-5 h-5 text-gray-700" />
+        <div className="fixed inset-0 z-[1001] lg:hidden animate-fade-in">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="absolute top-0 left-0 w-80 h-full bg-white shadow-2xl p-8 flex flex-col transform transition-transform duration-500">
+            <div className="flex items-center justify-between mb-12">
+              <img src="/images/logo.png" alt="logo" className="h-10 w-auto object-contain" />
+              <button onClick={() => setMobileOpen(false)} className="p-3 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                <X className="w-5 h-5 text-gray-900" />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-6 text-[15px] font-semibold tracking-wide uppercase">
+            <nav className="flex flex-col gap-8">
               {navLinks.map((link) => (
                 <Link
-                  key={link}
-                  href={getPath(link)}
-                  onClick={() => {
-                    setActive(link);
-                    setMobileOpen(false);
-                  }}
-                  className={`flex items-center justify-between ${active === link ? "text-black" : "text-gray-500 hover:text-black transition"
-                    }`}
+                  key={link.name}
+                  href={link.path}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center justify-between text-xs font-black tracking-[0.3em] uppercase ${
+                    isActive(link.path) ? "text-black" : "text-gray-400"
+                  }`}
                 >
-                  {link}
+                  {link.name}
+                  {isActive(link.path) && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
                 </Link>
               ))}
             </nav>
 
-            <div className="mt-auto pt-8 border-t">
+            <div className="mt-auto space-y-4">
               {!user ? (
                 <button
                   onClick={() => {
                     setMobileOpen(false);
                     setIsLoginOpen(true);
                   }}
-                  className="w-full bg-black text-white py-3.5 rounded-md font-semibold tracking-wide hover:bg-gray-900 transition"
+                  className="w-full bg-black text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-black/20"
                 >
-                  LOGIN / REGISTER
+                  Access Account
                 </button>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="w-full flex items-center justify-center gap-2 bg-gray-100 text-black py-3.5 rounded-md font-semibold hover:bg-gray-200 transition"
-                  >
-                    <User className="w-5 h-5" />
-                    MY ACCOUNT
-                  </Link>
-                  {user.role === "admin" && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setMobileOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 bg-black text-white py-3.5 rounded-md font-semibold hover:bg-gray-900 transition"
-                    >
-                      <Shield className="w-5 h-5" />
-                      ADMIN PANEL
-                    </Link>
-                  )}
-                </div>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full flex items-center justify-center gap-3 bg-gray-50 text-black py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]"
+                >
+                  <User className="w-4 h-4" />
+                  Dashboard
+                </Link>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Login Modal */}
+      {/* Auth Modals */}
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
@@ -228,8 +223,6 @@ const Header = () => {
           setIsSignupOpen(true);
         }}
       />
-
-      {/* Signup Modal */}
       <SignupModal
         isOpen={isSignupOpen}
         onClose={() => setIsSignupOpen(false)}
@@ -243,3 +236,4 @@ const Header = () => {
 };
 
 export default Header;
+
