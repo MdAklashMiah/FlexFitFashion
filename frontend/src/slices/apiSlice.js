@@ -5,13 +5,13 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API,
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (token) {
         headers.set("token", token);
       }
       return headers;
     },
   }),
-  tagTypes: ["Product", "Order", "Category", "User", "Dashboard"],
+  tagTypes: ["Product", "Order", "Category", "User", "Dashboard", "Cart"],
   endpoints: (builder) => ({}),
 });

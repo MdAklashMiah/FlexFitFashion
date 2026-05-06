@@ -4,27 +4,27 @@ import apiClient from "./apiClient";
  * Auth Service for manual API calls using Axios
  */
 export const authService = {
-  // Example: Manual login if not using Redux Toolkit Query
+  // Manual login if not using Redux Toolkit Query
   login: async (credentials) => {
     try {
-      const response = await apiClient.post("/user/login", credentials);
+      const response = await apiClient.post("/auth/login", credentials);
       return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  // Example: Get user profile
+  // Get user profile (verify user session)
   getProfile: async () => {
     try {
-      const response = await apiClient.get("/user/profile");
+      const response = await apiClient.get("/auth/verifyuser");
       return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  // Example: Logout (Client-side)
+  // Logout (Client-side)
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

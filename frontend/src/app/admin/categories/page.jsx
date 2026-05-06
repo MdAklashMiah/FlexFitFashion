@@ -52,7 +52,7 @@ const AdminCategories = () => {
       data.append("name", formData.name);
       data.append("category", image); // Backend expects "category" field for image
 
-      await axios.post(`${process.env.NEXT_PUBLIC_API}/category/createcategory`, data, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API}/category/addcategory`, data, {
         headers: { token, "Content-Type": "multipart/form-data" }
       });
 
